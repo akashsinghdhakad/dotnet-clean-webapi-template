@@ -1,4 +1,10 @@
-# 🚀 dotnetWebApiCoreCBA – Web API Template
+# 🚀 dotnetWebApiCoreCBA – Complete Web API Template (In-Memory + SQL + EF Core + JWT)
+
+A production-ready, fully extensible **ASP.NET Core Web API Template** designed for real applications, demos, and rapid prototyping.
+
+This template provides **three selectable data modes**, **JWT authentication**, **clean architecture**, **global middleware**, and **a professional folder structure**.
+
+---
 
 A clean, modern, and reusable **ASP.NET Core Web API template** designed for production-ready REST APIs.  
 This template includes:
@@ -7,7 +13,7 @@ This template includes:
 - Global exception handling  
 - Interceptor-style middleware  
 - Layered (Service + Repository) structure  
-- Both **EF Core** and **In-Memory** data provider support  
+- **EF Core** and **In-Memory** and **SQL (Raw ADO.NET)** data provider support  
 - Clean folder structure  
 - Standard API response format  
 - Swagger/OpenAPI enabled automatically  
@@ -31,38 +37,18 @@ Choose based on your project:
 #### 1. **Without EF Core (In-Memory repository)**
 - Lightweight  
 - Great for testing  
-- No database required  
+- High performance  
 
-#### 2. **With EF Core**
+#### 2. **SQL (Raw ADO.NET)**
+- Direct SQL queries  
+- No EF Core dependency  
+- AppDbContext included  
+
+#### 3. **With EF Core**
 - SQL Server-ready  
 - Easily switchable by DI  
 - AppDbContext included  
 
-### ✅ Authentication Ready
-- JWT Authentication plug-in  
-- Authorization attributes ready  
-- Controllers easily secured  
-
-### ✅ Standard API Response Wrapper
-All responses follow:
-
-```json
-{
-  "success": true,
-  "message": "OK",
-  "data": { }
-}
-```
-
-Or in case of errors:
-
-```json
-{
-  "success": false,
-  "errorCode": "INTERNAL_ERROR",
-  "message": "Something went wrong"
-}
-```
 
 ### ✅ Routing & Swagger
 - Attribute-based routing  
@@ -70,18 +56,60 @@ Or in case of errors:
 
 ---
 
-## 📂 Folder Structure
+# 🌟 Highlights
+
+### 🔥 **3 Repository Modes**
+| Mode | Description |
+|------|-------------|
+| **In-Memory** | Fastest mode. No database required. Best for demos & testing. |
+| **SQL (Raw ADO.NET)** | Direct SQL queries. No EF Core dependency. High performance. |
+| **EF Core** | Full ORM support. Best for production-grade systems. |
+
+Switch with **one line** in `Program.cs`.
+
+---
+
+# 🔐 JWT Authentication Ready
+
+### ✅ Authentication Ready
+- JWT Authentication plug-in  
+- Authorization attributes ready  
+- Controllers easily secured  
+
+Features included:
+
+- `/api/auth/login` endpoint  
+- JWT token generator  
+- Configurable secret keys  
+- `[Authorize]` and `[AllowAnonymous]` support  
+
+---
+
+# 🧱 Architecture Overview
+
+- **Controllers** → handle HTTP  
+- **Services** → business logic  
+- **Repositories** → data access  
+- **Data Layer** → EF or SQL  
+- **Middleware** → logging, exception handling  
+- **DTOs** → clean request/response models  
+
+---
+
+# 📂 Folder Structure
 
 ```
 dotnetWebApiCoreCBA/
 │
 ├── Controllers/
-│     └── TodoController.cs
+│     ├── TodoController.cs
+│     └── AuthController.cs
 │
 ├── Models/
 │     ├── Entities/
 │     │     └── Todo.cs
-│     └── DTOs/
+│     ├── DTOs/
+│           ├── Auth/
 │           └── Todo/
 │                 ├── TodoCreateRequest.cs
 │                 └── TodoResponse.cs
@@ -89,13 +117,18 @@ dotnetWebApiCoreCBA/
 ├── Services/
 │     ├── Interfaces/
 │     └── Implementations/
-│           └── TodoService.cs
+│           ├── TodoService.cs
+│           └── AuthService.cs
 │
 ├── Repositories/
 │     ├── Interfaces/
-│     ├── Implementations/
-│     │     ├── InMemory/
-│     │     └── EfCore/
+│     └── Implementations/
+│           ├── InMemory/
+│           │     └── TodoRepositoryInMemory.cs
+│           ├── EfCore/
+│           │     └── TodoRepositoryEf.cs
+│           └── Sql/
+│                 └── TodoRepositorySql.cs
 │
 ├── Middleware/
 │     ├── ExceptionHandlingMiddleware.cs
@@ -105,7 +138,8 @@ dotnetWebApiCoreCBA/
 │     └── AppDbContext.cs
 │
 ├── Common/
-│     └── ApiResponse.cs
+│     ├── ApiResponse.cs
+│     └── JwtSettings.cs
 │
 ├── Program.cs
 └── README.md
@@ -113,28 +147,21 @@ dotnetWebApiCoreCBA/
 
 ---
 
-## ⚙️ Setup Instructions
+# ⚙️ Setup Instructions
 
-### 1️⃣ Install Dependencies
+## 1️⃣ Restore dependencies
 
 ```bash
 dotnet restore
 ```
 
-### 2️⃣ Run the API
+## 2️⃣ Run the API
 
 ```bash
 dotnet run
 ```
 
-API will start at:
-
-```
-http://localhost:5000
-https://localhost:7000
-```
-
-Swagger UI:
+Swagger available at:
 
 ```
 /swagger
@@ -142,19 +169,57 @@ Swagger UI:
 
 ---
 
-## 🔀 Switching Between In-Memory & EF Core
+# 🔀 Choosing Repository Mode
 
-### Use **In-Memory Repository** (default)
+---
 
-In `Program.cs`:
+## ▶️ **Mode 1: In-Memory Repository** (No DB)
+
+`Program.cs`:
 
 ```csharp
 builder.Services.AddScoped<ITodoRepository, TodoRepositoryInMemory>();
 ```
 
-### Use **EF Core Repository**
+Zero configuration required.
 
-Uncomment:
+---
+
+## ▶️ **Mode 2: SQL Repository (Raw ADO.NET)**
+
+### Configure connection string
+
+`appsettings.json`:
+
+```json
+"ConnectionStrings": {
+  "DefaultConnection": "Server=.;Database=TodoDb;Trusted_Connection=True;TrustServerCertificate=True"
+}
+```
+
+### Enable SQL mode
+
+`Program.cs`:
+
+```csharp
+builder.Services.AddScoped<ITodoRepository, TodoRepositorySql>();
+```
+
+### SQL Table
+
+```sql
+CREATE TABLE Todos (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Title NVARCHAR(200) NOT NULL,
+    IsCompleted BIT NOT NULL DEFAULT(0)
+);
+```
+
+---
+
+## ▶️ **Mode 3: EF Core Repository**
+
+`Program.cs`:
 
 ```csharp
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -165,84 +230,104 @@ builder.Services.AddScoped<ITodoRepository, TodoRepositoryEf>();
 
 ---
 
-## 🔐 Authentication (Optional)
+# 🔐 JWT Authentication
 
-To enable JWT:
+### appsettings.json:
 
-1. Add auth config in `Program.cs`  
-2. Add authorization attributes:
-
-```csharp
-[Authorize]
-public class TodoController : ControllerBase
+```json
+"Jwt": {
+  "Key": "CHANGE_THIS_SECRET",
+  "Issuer": "dotnetWebApiCoreCBA",
+  "Audience": "dotnetWebApiCoreCBAClient",
+  "ExpiresInMinutes": 60
+}
 ```
 
-3. Allow public routes:
+### Login Endpoint
 
-```csharp
-[AllowAnonymous]
+**POST** `/api/auth/login`
+
+Request:
+
+```json
+{
+  "username": "admin",
+  "password": "admin123"
+}
 ```
 
----
-
-## 🧪 API Conventions
-
-### Success Example
+Response:
 
 ```json
 {
   "success": true,
-  "message": "Todo created successfully",
   "data": {
-    "id": 1,
-    "title": "Learn .NET Core",
-    "isCompleted": false
+    "token": "<jwt_token>",
+    "expiresAt": "2025-01-01T00:00:00Z",
+    "username": "admin"
   }
 }
 ```
 
-### Error Example
+---
+
+# 🧪 API Response Structure
+
+### ✔ Success Example
+
+```json
+{
+  "success": true,
+  "message": "Operation successful",
+  "data": { }
+}
+```
+
+### ❌ Error Example
 
 ```json
 {
   "success": false,
-  "errorCode": "NOT_FOUND",
-  "message": "Todo not found"
+  "errorCode": "VALIDATION_ERROR",
+  "message": "Invalid request data"
 }
 ```
 
 ---
 
-## 🛠 Development Tools Used
+# 🛠 Tools & Technologies
 
-- .NET 8/9/10 SDK  
-- Swashbuckle (Swagger)  
-- EF Core (Optional)  
+- .NET 8 / .NET 9 / .NET 10 SDK  
+- SQL Server (optional)  
+- Entity Framework Core  
 - Visual Studio Code  
+- Swagger / Swashbuckle  
 
 ---
 
-## 🤝 Contributing
+# 🤝 Contributing
 
-1. Fork the repository  
-2. Create a new feature branch  
-3. Commit your changes  
-4. Make a pull request  
-
----
-
-## 📄 License
-
-This template is free to modify and use in any project.
+1. Fork  
+2. Create feature branch  
+3. Commit changes  
+4. Submit PR  
 
 ---
 
-## 🙋 Need Help?
+# 📄 License
 
-If you want enhancements like:
-- Clean Architecture (multi-project) version  
-- Auto code generator script  
-- JWT login implementation  
-- CI/CD ready template  
+Free to use, modify, and distribute.
 
-Just ask — I can generate these too.
+---
+
+# 🙋 Need More Features?
+
+I can generate:
+
+- Clean Architecture version  
+- Multi-project enterprise scaffold  
+- Dapper Repository Mode  
+- MongoDB Mode  
+- Auto repository selection via config  
+
+Just ask anytime 🚀

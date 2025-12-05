@@ -2,6 +2,7 @@ using DotnetWebApiCoreCBA.Data;
 using DotnetWebApiCoreCBA.Middleware;
 using DotnetWebApiCoreCBA.Repositories.Implementations.EfCore;
 using DotnetWebApiCoreCBA.Repositories.Implementations.InMemory;
+using DotnetWebApiCoreCBA.Repositories.Implementations.Sql;
 using DotnetWebApiCoreCBA.Repositories.Interfaces;
 using DotnetWebApiCoreCBA.Services.Implementations;
 using DotnetWebApiCoreCBA.Services.Interfaces;
@@ -36,16 +37,36 @@ builder.Services.AddScoped<ITodoService, TodoService>();
 
 // Choose repository implementation here:
 // WITHOUT EF:
-builder.Services.AddScoped<ITodoRepository, TodoRepositoryInMemory>();
+// builder.Services.AddScoped<ITodoRepository, TodoRepositoryInMemory>();
 
 // WITH EF (uncomment when using EF):
 // builder.Services.AddDbContext<AppDbContext>(options =>
 //     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 // builder.Services.AddScoped<ITodoRepository, TodoRepositoryEf>();
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-builder.Services.AddScoped<ITodoRepository, TodoRepositoryEf>();
+// WITH SQL:
+// builder.Services.AddScoped<ITodoRepository, TodoRepositorySql>();
+
+var repoMode = builder.Configuration["RepositoryMode"]; // "InMemory" / "Sql" / "Ef"
+
+switch (repoMode)
+{
+    case "InMemory":
+        builder.Services.AddScoped<ITodoRepository, TodoRepositoryInMemory>();
+        break;
+
+    case "Sql":
+        builder.Services.AddScoped<ITodoRepository, TodoRepositorySql>();
+        break;
+
+    case "Ef":
+    default:
+        builder.Services.AddDbContext<AppDbContext>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+        builder.Services.AddScoped<ITodoRepository, TodoRepositoryEf>();
+        break;
+}
+
 
 
 // Custom middleware dependencies if needed…

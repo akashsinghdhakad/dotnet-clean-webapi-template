@@ -64,7 +64,7 @@ namespace DotnetWebApiCoreCBA.Services.Implementations
 
             entity.Title = request.Title;
 
-            _repo.Update(entity);
+            await _repo.UpdateAsync(entity);
             await _repo.SaveChangesAsync();
 
             return new TodoResponse
@@ -80,7 +80,7 @@ namespace DotnetWebApiCoreCBA.Services.Implementations
             var entity = await _repo.GetByIdAsync(id);
             if (entity == null) return false;
 
-            _repo.Remove(entity);
+            await _repo.RemoveAsync(entity.Id);
             await _repo.SaveChangesAsync();
             return true;
         }

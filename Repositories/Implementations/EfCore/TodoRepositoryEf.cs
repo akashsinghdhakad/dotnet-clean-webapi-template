@@ -23,11 +23,21 @@ namespace DotnetWebApiCoreCBA.Repositories.Implementations.EfCore
         public async Task AddAsync(Todo entity)
             => await _db.Todos.AddAsync(entity);
 
-        public void Update(Todo entity)
-            => _db.Todos.Update(entity);
+        public Task UpdateAsync(Todo entity)
+        {
+            _db.Todos.Update(entity);
+            return Task.CompletedTask;
+        }
 
-        public void Remove(Todo entity)
-            => _db.Todos.Remove(entity);
+        public async Task RemoveAsync(int id)
+        {
+            var item = await _db.Todos.FindAsync(id);
+            if (item != null)
+            {
+                _db.Todos.Remove(item);
+            }
+        }
+
 
         public async Task SaveChangesAsync()
             => await _db.SaveChangesAsync();

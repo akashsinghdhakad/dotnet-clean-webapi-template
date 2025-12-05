@@ -21,12 +21,20 @@ namespace DotnetWebApiCoreCBA.Repositories.Implementations.InMemory
             return Task.CompletedTask;
         }
 
-        public void Update(Todo entity)
+        public Task UpdateAsync(Todo entity)
         {
             // nothing special for in-memory list
+            return Task.CompletedTask;
+
         }
 
-        public void Remove(Todo entity) => _items.Remove(entity);
+        public Task RemoveAsync(int id)
+        {
+            var item = _items.FirstOrDefault(x => x.Id == id);
+            if (item != null) _items.Remove(item);
+            return Task.CompletedTask;
+        }
+
 
         public Task SaveChangesAsync() => Task.CompletedTask;
     }
