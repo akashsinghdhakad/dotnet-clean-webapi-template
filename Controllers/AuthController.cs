@@ -1,15 +1,16 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using DotnetWebApiCoreCBA.Common;
-using DotnetWebApiCoreCBA.Models.DTOs.Auth;
-using DotnetWebApiCoreCBA.Services.Interfaces;
+using dotnetWebApiCoreCBA.Common;
+using dotnetWebApiCoreCBA.Models.DTOs.Auth;
+using dotnetWebApiCoreCBA.Services.Interfaces;
 
-namespace DotnetWebApiCoreCBA.Controllers;
+namespace dotnetWebApiCoreCBA.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
 public class AuthController : ControllerBase
 {
+
     private readonly IAuthService _authService;
 
     public AuthController(IAuthService authService)
@@ -17,35 +18,55 @@ public class AuthController : ControllerBase
         _authService = authService;
     }
 
-    [HttpPost("login")]
+    // POST: api/auth/register
+    [HttpPost("register")]
     [AllowAnonymous]
-    public async Task<ActionResult<ApiResponse<LoginResponse>>> Login([FromBody] LoginRequest request)
+    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
         if (!ModelState.IsValid)
-        {
-            return BadRequest(ApiResponse<LoginResponse>.Fail("VALIDATION_ERROR", "Invalid login data"));
-        }
+            return BadRequest(ApiResponse<LoginResponse?>.Fail("VALIDATION_ERROR","Invalid data"));
+
+        var result = await _authService.RegisterAsync(request);
+        if (result == null)
+            return BadRequest(ApiResponse<LoginResponse?>.Fail("ERR_USER_EXISTS","Username already exists"));
+
+        return Ok(ApiResponse<LoginResponse>.Ok(result, "User registered successfully"));
+    }
+
+    // POST: api/auth/login
+    [HttpPost("login")]
+    [AllowAnonymous]
+    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ApiResponse<LoginResponse?>.Fail("BADREQUEST","Invalid data"));
 
         var result = await _authService.LoginAsync(request);
         if (result == null)
-        {
-            return Unauthorized(ApiResponse<LoginResponse>.Fail("INVALID_CREDENTIALS", "Invalid username or password"));
-        }
+            return Unauthorized(ApiResponse<LoginResponse?>.Fail("UNAUTHORIZED","Invalid username or password"));
 
         return Ok(ApiResponse<LoginResponse>.Ok(result, "Login successful"));
     }
 
+    // GET: api/auth/me
     [HttpGet("me")]
     [Authorize]
-    public ActionResult<ApiResponse<object>> Me()
+    public IActionResult Me()
     {
-        var username = User.Identity?.Name ?? "unknown";
+        var username =
+            User.Identity?.Name
+            ?? User.FindFirst("unique_name")?.Value
+            ?? User.FindFirst("unique_name")?.Value;
 
-        return Ok(ApiResponse<object>.Ok(new
+        var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+
+        var data = new
         {
             Username = username,
-            Claims = User.Claims.Select(c => new { c.Type, c.Value })
-        }));
+            Role = role
+        };
+
+        return Ok(ApiResponse<object>.Ok(data));
     }
 
     [HttpGet("public")]

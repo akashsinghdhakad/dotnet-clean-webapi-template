@@ -1,9 +1,9 @@
-using DotnetWebApiCoreCBA.Models.DTOs.Todo;
-using DotnetWebApiCoreCBA.Models.Entities;
-using DotnetWebApiCoreCBA.Repositories.Interfaces;
-using DotnetWebApiCoreCBA.Services.Interfaces;
+using dotnetWebApiCoreCBA.Models.DTOs.Todo;
+using dotnetWebApiCoreCBA.Models.Entities;
+using dotnetWebApiCoreCBA.Repositories.Interfaces;
+using dotnetWebApiCoreCBA.Services.Interfaces;
 
-namespace DotnetWebApiCoreCBA.Services.Implementations
+namespace dotnetWebApiCoreCBA.Services.Implementations
 {
     public class TodoService : ITodoService
     {

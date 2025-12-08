@@ -1,6 +1,6 @@
-using DotnetWebApiCoreCBA.Models.DTOs.Todo;
+using dotnetWebApiCoreCBA.Models.DTOs.Todo;
 
-namespace DotnetWebApiCoreCBA.Services.Interfaces
+namespace dotnetWebApiCoreCBA.Services.Interfaces
 {
     public interface ITodoService
     {

@@ -1,4 +1,4 @@
-namespace DotnetWebApiCoreCBA.Models.Entities
+namespace dotnetWebApiCoreCBA.Models.Entities
 {
     public class Todo
     {

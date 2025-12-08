@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using DotnetWebApiCoreCBA.Data;
-using DotnetWebApiCoreCBA.Models.Entities;
-using DotnetWebApiCoreCBA.Repositories.Interfaces;
+using dotnetWebApiCoreCBA.Data;
+using dotnetWebApiCoreCBA.Models.Entities;
+using dotnetWebApiCoreCBA.Repositories.Interfaces;
 
-namespace DotnetWebApiCoreCBA.Repositories.Implementations.EfCore
+namespace dotnetWebApiCoreCBA.Repositories.Implementations.EfCore
 {
     public class TodoRepositoryEf : ITodoRepository
     {

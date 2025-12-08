@@ -1,4 +1,4 @@
-namespace DotnetWebApiCoreCBA.Middleware
+namespace dotnetWebApiCoreCBA.Middleware
 {
     public class RequestLoggingMiddleware
     {

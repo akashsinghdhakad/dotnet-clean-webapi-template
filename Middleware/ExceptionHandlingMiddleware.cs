@@ -1,8 +1,8 @@
 using System.Net;
 using System.Text.Json;
-using DotnetWebApiCoreCBA.Common;
+using dotnetWebApiCoreCBA.Common;
 
-namespace DotnetWebApiCoreCBA.Middleware
+namespace dotnetWebApiCoreCBA.Middleware
 {
     public class ExceptionHandlingMiddleware
     {

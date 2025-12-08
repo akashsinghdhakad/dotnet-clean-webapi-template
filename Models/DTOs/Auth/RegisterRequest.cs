@@ -1,12 +1,8 @@
-using System.ComponentModel.DataAnnotations;
 
 namespace dotnetWebApiCoreCBA.Models.DTOs.Auth;
 
-public class LoginRequest
+public class RegisterRequest
 {
-    [Required]
     public string Username { get; set; } = string.Empty;
-
-    [Required]
     public string Password { get; set; } = string.Empty;
 }

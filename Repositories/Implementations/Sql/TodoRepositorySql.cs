@@ -1,9 +1,9 @@
 using System.Data;
 using Microsoft.Data.SqlClient;
-using DotnetWebApiCoreCBA.Models.Entities;
-using DotnetWebApiCoreCBA.Repositories.Interfaces;
+using dotnetWebApiCoreCBA.Models.Entities;
+using dotnetWebApiCoreCBA.Repositories.Interfaces;
 
-namespace DotnetWebApiCoreCBA.Repositories.Implementations.Sql;
+namespace dotnetWebApiCoreCBA.Repositories.Implementations.Sql;
 
 public class TodoRepositorySql : ITodoRepository
 {

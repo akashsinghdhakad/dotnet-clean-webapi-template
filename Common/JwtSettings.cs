@@ -1,4 +1,4 @@
-namespace DotnetWebApiCoreCBA.Common;
+namespace dotnetWebApiCoreCBA.Common;
 
 public class JwtSettings
 {

@@ -1,6 +1,6 @@
-using DotnetWebApiCoreCBA.Models.Entities;
+using dotnetWebApiCoreCBA.Models.Entities;
 
-namespace DotnetWebApiCoreCBA.Repositories.Interfaces
+namespace dotnetWebApiCoreCBA.Repositories.Interfaces
 {
     public interface ITodoRepository
     {

@@ -1,4 +1,4 @@
-namespace DotnetWebApiCoreCBA.Models.DTOs.Todo
+namespace dotnetWebApiCoreCBA.Models.DTOs.Todo
 {
     public class TodoResponse
     {

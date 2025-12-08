@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace DotnetWebApiCoreCBA.Models.DTOs.Todo
+namespace dotnetWebApiCoreCBA.Models.DTOs.Todo
 {
     public class TodoCreateRequest
     {

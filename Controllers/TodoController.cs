@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using DotnetWebApiCoreCBA.Common;
-using DotnetWebApiCoreCBA.Models.DTOs.Todo;
-using DotnetWebApiCoreCBA.Services.Interfaces;
+using dotnetWebApiCoreCBA.Common;
+using dotnetWebApiCoreCBA.Models.DTOs.Todo;
+using dotnetWebApiCoreCBA.Services.Interfaces;
 
-namespace DotnetWebApiCoreCBA.Controllers
+namespace dotnetWebApiCoreCBA.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

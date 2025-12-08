@@ -1,64 +1,124 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using DotnetWebApiCoreCBA.Common;
-using DotnetWebApiCoreCBA.Models.DTOs.Auth;
-using DotnetWebApiCoreCBA.Services.Interfaces;
+using dotnetWebApiCoreCBA.Common;
+using dotnetWebApiCoreCBA.Models.DTOs.Auth;
+using dotnetWebApiCoreCBA.Models.Entities;
+using dotnetWebApiCoreCBA.Repositories.Interfaces;
+using dotnetWebApiCoreCBA.Services.Interfaces;
 
-namespace DotnetWebApiCoreCBA.Services.Implementations;
+namespace dotnetWebApiCoreCBA.Services.Implementations;
 
 public class AuthService : IAuthService
 {
-    private readonly JwtSettings _jwt;
+    private readonly IUserRepository _userRepository;
+    private readonly JwtSettings _jwtSettings;
 
-    public AuthService(IOptions<JwtSettings> jwtOptions)
+    public AuthService(IUserRepository userRepository, IOptions<JwtSettings> jwtOptions)
     {
-        _jwt = jwtOptions.Value;
+        _userRepository = userRepository;
+        _jwtSettings = jwtOptions.Value;
     }
 
-    // For demo only – replace with DB check later
-    private bool ValidateUser(string username, string password)
-        => username == "admin" && password == "admin123";
-
-    public Task<LoginResponse?> LoginAsync(LoginRequest request)
+    public async Task<LoginResponse?> RegisterAsync(RegisterRequest request)
     {
-        if (!ValidateUser(request.Username, request.Password))
-            return Task.FromResult<LoginResponse?>(null);
+        var existing = await _userRepository.GetByUsernameAsync(request.Username);
+        if (existing != null) return null; // username taken
 
-        var key = Encoding.UTF8.GetBytes(_jwt.Key);
-        var tokenHandler = new JwtSecurityTokenHandler();
+        CreatePasswordHash(request.Password, out var hash, out var salt);
 
-        var claims = new List<Claim>
+        var user = new User
         {
-            new(ClaimTypes.Name, request.Username),
-            new(ClaimTypes.Role, "Admin")
+            Username = request.Username,
+            PasswordHash = hash,
+            PasswordSalt = salt,
+            Role = "User"
         };
 
-        var expires = DateTime.UtcNow.AddMinutes(_jwt.ExpiresInMinutes);
+        user = await _userRepository.CreateAsync(user);
 
-        var tokenDescriptor = new SecurityTokenDescriptor
+        var token = GenerateJwtToken(user);
+
+        return new LoginResponse
         {
-            Subject = new ClaimsIdentity(claims),
-            Expires = expires,
-            Issuer = _jwt.Issuer,
-            Audience = _jwt.Audience,
-            SigningCredentials = new SigningCredentials(
-                new SymmetricSecurityKey(key),
-                SecurityAlgorithms.HmacSha256Signature)
+            Username = user.Username,
+            Role = user.Role,
+            Token = token
         };
-
-        var token = tokenHandler.CreateToken(tokenDescriptor);
-        var jwt = tokenHandler.WriteToken(token);
-
-        var response = new LoginResponse
-        {
-            Token = jwt,
-            ExpiresAt = expires,
-            Username = request.Username
-        };
-
-        return Task.FromResult<LoginResponse?>(response);
     }
+
+    public async Task<LoginResponse?> LoginAsync(LoginRequest request)
+    {
+        var user = await _userRepository.GetByUsernameAsync(request.Username);
+        if (user == null) return null;
+
+        if (!VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
+            return null;
+
+        var token = GenerateJwtToken(user);
+
+        return new LoginResponse
+        {
+            Username = user.Username,
+            Role = user.Role,
+            Token = token
+        };
+    }
+
+    #region Password Hashing (PBKDF2)
+
+    private static void CreatePasswordHash(string password, out string hash, out string salt)
+    {
+        using var rng = RandomNumberGenerator.Create();
+        var saltBytes = new byte[16];
+        rng.GetBytes(saltBytes);
+
+        using var pbkdf2 = new Rfc2898DeriveBytes(password, saltBytes, 100_000, HashAlgorithmName.SHA256);
+        var hashBytes = pbkdf2.GetBytes(32);
+
+        hash = Convert.ToBase64String(hashBytes);
+        salt = Convert.ToBase64String(saltBytes);
+    }
+
+    private static bool VerifyPasswordHash(string password, string storedHash, string storedSalt)
+    {
+        var saltBytes = Convert.FromBase64String(storedSalt);
+        var hashBytes = Convert.FromBase64String(storedHash);
+
+        using var pbkdf2 = new Rfc2898DeriveBytes(password, saltBytes, 100_000, HashAlgorithmName.SHA256);
+        var computedHash = pbkdf2.GetBytes(32);
+
+        return CryptographicOperations.FixedTimeEquals(computedHash, hashBytes);
+    }
+
+    #endregion
+
+    #region JWT
+
+    private string GenerateJwtToken(User user)
+    {
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        var claims = new[]
+        {
+            new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+            new Claim(JwtRegisteredClaimNames.UniqueName, user.Username),
+            new Claim(ClaimTypes.Role, user.Role)
+        };
+
+        var token = new JwtSecurityToken(
+            issuer: _jwtSettings.Issuer,
+            audience: _jwtSettings.Audience,
+            claims: claims,
+            expires: DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiresInMinutes),
+            signingCredentials: creds);
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    #endregion
 }

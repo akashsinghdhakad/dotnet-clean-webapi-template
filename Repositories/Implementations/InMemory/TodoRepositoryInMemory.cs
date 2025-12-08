@@ -1,7 +1,7 @@
-using DotnetWebApiCoreCBA.Models.Entities;
-using DotnetWebApiCoreCBA.Repositories.Interfaces;
+using dotnetWebApiCoreCBA.Models.Entities;
+using dotnetWebApiCoreCBA.Repositories.Interfaces;
 
-namespace DotnetWebApiCoreCBA.Repositories.Implementations.InMemory
+namespace dotnetWebApiCoreCBA.Repositories.Implementations.InMemory
 {
     public class TodoRepositoryInMemory : ITodoRepository
     {
