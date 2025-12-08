@@ -1,3 +1,5 @@
+using System.Text;
+using DotnetWebApiCoreCBA.Common;
 using DotnetWebApiCoreCBA.Data;
 using DotnetWebApiCoreCBA.Middleware;
 using DotnetWebApiCoreCBA.Repositories.Implementations.EfCore;
@@ -6,7 +8,9 @@ using DotnetWebApiCoreCBA.Repositories.Implementations.Sql;
 using DotnetWebApiCoreCBA.Repositories.Interfaces;
 using DotnetWebApiCoreCBA.Services.Implementations;
 using DotnetWebApiCoreCBA.Services.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,13 +25,33 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// JWT Auth (wire up from config)
-builder.Services.AddAuthentication("Bearer")
-    .AddJwtBearer("Bearer", options =>
+// ===== JWT CONFIG =====
+var jwtSection = builder.Configuration.GetSection("Jwt");
+builder.Services.Configure<JwtSettings>(jwtSection);
+
+var key = Encoding.UTF8.GetBytes(jwtSection["Key"]!);
+
+builder.Services
+    .AddAuthentication(options =>
     {
-        options.Authority = builder.Configuration["Jwt:Authority"]; // or your own
-        options.Audience = builder.Configuration["Jwt:Audience"];
-        // options.RequireHttpsMetadata = false; // for dev
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.RequireHttpsMetadata = false; // set true in production with HTTPS
+        options.SaveToken = true;
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateIssuerSigningKey = true,
+            ValidateLifetime = true,
+            ValidIssuer = jwtSection["Issuer"],
+            ValidAudience = jwtSection["Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ClockSkew = TimeSpan.Zero
+        };
     });
 
 builder.Services.AddAuthorization();
@@ -66,6 +90,9 @@ switch (repoMode)
         builder.Services.AddScoped<ITodoRepository, TodoRepositoryEf>();
         break;
 }
+
+builder.Services.AddScoped<IAuthService, AuthService>(); // add this
+
 
 
 
