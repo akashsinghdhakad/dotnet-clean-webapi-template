@@ -71,32 +71,26 @@ builder.Services.AddScoped<ITodoService, TodoService>();
 // WITH SQL:
 // builder.Services.AddScoped<ITodoRepository, TodoRepositorySql>();
 
-// var repoMode = builder.Configuration["RepositoryMode"]; // "InMemory" / "Sql" / "Ef"
+var repoMode = builder.Configuration["RepositoryMode"]; // "InMemory" / "Sql" / "Ef"
 
-// switch (repoMode)
-// {
-//     case "InMemory":
-//         builder.Services.AddScoped<ITodoRepository, TodoRepositoryInMemory>();
-//         break;
+switch (repoMode)
+{
+    case "InMemory":
+        builder.Services.AddScoped<ITodoRepository, TodoRepositoryInMemory>();
+        break;
 
-//     case "Sql":
-//         builder.Services.AddScoped<ITodoRepository, TodoRepositorySql>();
-//         break;
+    case "Sql":
+        builder.Services.AddScoped<ITodoRepository, TodoRepositorySql>();
+        break;
 
-//     case "Ef":
-//     default:
-//         builder.Services.AddDbContext<AppDbContext>(options =>
-//             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-//         builder.Services.AddScoped<ITodoRepository, TodoRepositoryEf>();
-//         break;
-// }
-
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-builder.Services.AddScoped<ITodoRepository, TodoRepositoryEf>();
-
-builder.Services.AddScoped<IUserRepository, UserRepositoryEf>();
+    case "Ef":
+    default:
+        builder.Services.AddDbContext<AppDbContext>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+        builder.Services.AddScoped<ITodoRepository, TodoRepositoryEf>();
+        builder.Services.AddScoped<IUserRepository, UserRepositoryEf>();
+        break;
+}
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 
