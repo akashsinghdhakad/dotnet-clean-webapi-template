@@ -1,3 +1,4 @@
+using dotnetWebApiCoreCBA.Common;
 using dotnetWebApiCoreCBA.Services.Implementations;
 using dotnetWebApiCoreCBA.Services.Interfaces;
 
@@ -12,9 +13,16 @@ public static class ServiceConfig
         services.AddScoped<ITodoService, TodoService>();
         services.AddScoped<IAuthService, AuthService>();
 
-        // any other domain services in future
-        // services.AddScoped<IEmailService, EmailService>();
+        // Bind settings
+        services.Configure<EmailSettings>(configuration.GetSection("Email"));
+        services.Configure<SmsSettings>(configuration.GetSection("Sms"));
 
+        // Register email & SMS services
+        services.AddScoped<IEmailService, EmailService>();
+        services.AddScoped<ISmsService, SmsService>();
+
+        // any other domain services in future
+        
         return services;
     }
 }

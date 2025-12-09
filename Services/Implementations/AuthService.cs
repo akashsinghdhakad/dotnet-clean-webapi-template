@@ -16,11 +16,13 @@ public class AuthService : IAuthService
 {
     private readonly IUserRepository _userRepository;
     private readonly JwtSettings _jwtSettings;
+    private readonly IEmailService _emailService;
 
-    public AuthService(IUserRepository userRepository, IOptions<JwtSettings> jwtOptions)
+    public AuthService(IUserRepository userRepository, IOptions<JwtSettings> jwtOptions, IEmailService emailService)
     {
         _userRepository = userRepository;
         _jwtSettings = jwtOptions.Value;
+        _emailService = emailService;
     }
 
     public async Task<LoginResponse?> RegisterAsync(RegisterRequest request)
@@ -39,6 +41,12 @@ public class AuthService : IAuthService
         };
 
         user = await _userRepository.CreateAsync(user);
+
+        await _emailService.SendAsync(
+           toEmail: request.Username, // if username is email
+           subject: "Welcome to MyApp",
+           body: $"Hi {request.Username}, your account was created successfully!");
+
 
         var token = GenerateJwtToken(user);
 
