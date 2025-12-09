@@ -101,48 +101,76 @@ Features included:
 ```
 dotnetWebApiCoreCBA/
 │
-├── Controllers/
-│     ├── TodoController.cs
-│     └── AuthController.cs
-│
-├── Models/
-│     ├── Entities/
-│     │     └── Todo.cs
-│     ├── DTOs/
-│           ├── Auth/
-│           └── Todo/
-│                 ├── TodoCreateRequest.cs
-│                 └── TodoResponse.cs
-│
-├── Services/
-│     ├── Interfaces/
-│     └── Implementations/
-│           ├── TodoService.cs
-│           └── AuthService.cs
-│
-├── Repositories/
-│     ├── Interfaces/
-│     └── Implementations/
-│           ├── InMemory/
-│           │     └── TodoRepositoryInMemory.cs
-│           ├── EfCore/
-│           │     └── TodoRepositoryEf.cs
-│           └── Sql/
-│                 └── TodoRepositorySql.cs
-│
-├── Middleware/
-│     ├── ExceptionHandlingMiddleware.cs
-│     └── RequestLoggingMiddleware.cs
-│
-├── Data/
-│     └── AppDbContext.cs
+├── Program.cs                  # Entry point – just wires everything together
+├── appsettings.json            # Connection strings, Jwt settings, etc.
+├── appsettings.Development.json
 │
 ├── Common/
-│     ├── ApiResponse.cs
-│     └── JwtSettings.cs
+│   ├── ApiResponse.cs          # Standard response wrapper {success, data, message, errorCode}
+│   └── JwtSettings.cs          # Strongly-typed config for Jwt (Key, Issuer, Audience, Expiry)
 │
-├── Program.cs
-└── README.md
+├── Data/
+│   ├── AppDbContext.cs         # EF Core DbContext (Users, Todos, etc.)
+│   └── AppDbContextFactory.cs  # Design-time factory for migrations (used by dotnet ef)
+│
+├── Models/
+│   ├── Entities/
+│   │   ├── User.cs             # User entity mapped to Users table
+│   │   └── Todo.cs             # Todo entity mapped to Todos table
+│   │
+│   └── DTOs/
+│       ├── Auth/
+│       │   ├── RegisterRequest.cs
+│       │   ├── LoginRequest.cs
+│       │   └── LoginResponse.cs
+│       │
+│       └── Todo/
+│           ├── TodoCreateRequest.cs
+│           ├── TodoUpdateRequest.cs
+│           └── TodoResponse.cs
+│
+├── Repositories/
+│   ├── Interfaces/
+│   │   ├── ITodoRepository.cs  # Abstraction for todo data access
+│   │   └── IUserRepository.cs  # Abstraction for user data access
+│   │
+│   └── Implementations/
+│       ├── EfCore/
+│       │   ├── TodoRepositoryEf.cs   # Todo repo using EF Core
+│       │   └── UserRepositoryEf.cs   # User repo using EF Core
+│       │
+│       ├── Sql/
+│       │   └── TodoRepositorySql.cs  # Todo repo using raw SQL / ADO.NET
+│       │
+│       └── InMemory/
+│           └── TodoRepositoryInMemory.cs  # Todo repo for testing / demo
+│
+├── Services/
+│   ├── Interfaces/
+│   │   ├── ITodoService.cs     # Business logic contract for todos
+│   │   └── IAuthService.cs     # Business logic contract for auth
+│   │
+│   └── Implementations/
+│       ├── TodoService.cs      # Todo business logic (uses ITodoRepository)
+│       └── AuthService.cs      # Auth logic: register, login, hashing, JWT
+│
+├── Controllers/
+│   ├── AuthController.cs       # /api/auth/register, /api/auth/login
+│   └── TodoController.cs       # /api/todo CRUD (secured via [Authorize])
+│
+├── Middleware/
+│   ├── RequestLoggingMiddleware.cs    # Logs incoming requests (path, method, etc.)
+│   └── ExceptionHandlingMiddleware.cs # Global try/catch → returns unified error response
+│
+├── Extensions/                 # (previously Configuration/)
+│   ├── JwtExtensions.cs        # AddJwtAuthentication(this IServiceCollection,…)
+│   ├── SwaggerExtensions.cs    # AddApiDocumentation(this IServiceCollection)
+│   ├── PersistenceExtensions.cs# AddPersistence(this IServiceCollection,… DbContext + repos)
+│   ├── ServiceExtensions.cs    # AddApplicationServices(this IServiceCollection)
+│   └── PipelineExtensions.cs   # UseApplicationPipeline(this WebApplication)
+│
+└── README.md                   # Docs for how to use this template
+
 ```
 
 ---
