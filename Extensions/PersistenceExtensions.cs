@@ -28,6 +28,8 @@ public static class PersistenceConfig
             // no DbContext; use plain ADO.NET / Dapper style repository
             services.AddScoped<ITodoRepository, TodoRepositorySql>();
             // you could add Sql-based IUserRepository too if needed
+            
+            services.AddScoped<IUserRepository, UserRepositorySql>();
         }
         else // InMemory (default for tests if you want)
         {
