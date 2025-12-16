@@ -18,11 +18,15 @@ public static class ServiceConfig
         services.Configure<SmsSettings>(configuration.GetSection("Sms"));
 
         // Register email & SMS services
-        services.AddScoped<IEmailService, EmailService>();
-        services.AddScoped<ISmsService, SmsService>();
+        // services.AddScoped<IEmailService, EmailService>();
+        // services.AddScoped<ISmsService, SmsService>();
+
+        // Infrastructure helpers (side effects)
+        services.AddTransient<IEmailService, EmailService>();
+        services.AddTransient<ISmsService, SmsService>();
 
         // any other domain services in future
-        
+
         return services;
     }
 }

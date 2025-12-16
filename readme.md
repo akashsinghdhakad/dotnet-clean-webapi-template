@@ -199,6 +199,11 @@ Swagger available at:
 
 # 🔀 Choosing Repository Mode
 
+Configured via `appsettings.json`:
+
+```json
+"RepositoryMode": "Ef" //InMemory, Ef, Sql
+```
 ---
 
 ## ▶️ **Mode 1: In-Memory Repository** (No DB)
@@ -255,7 +260,15 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped<ITodoRepository, TodoRepositoryEf>();
 ```
+`EF Core Commands`:
 
+```bash
+dotnet clean
+dotnet build
+dotnet ef migrations add InitialAuth
+dotnet ef database update
+dotnet ef database update 0   # rollback (dev only)
+```
 ---
 
 # 🔐 JWT Authentication
@@ -320,6 +333,67 @@ Response:
   "message": "Invalid request data"
 }
 ```
+
+---
+
+## ⚙️ Dependency Injection
+
+| Component | Lifetime |
+|--------|--------|
+| Controllers | Scoped |
+| Services | Scoped |
+| Repositories | Scoped |
+| DbContext | Scoped |
+| ConnectionFactory | Singleton |
+| Email/SMS | Transient |
+
+---
+## 🧠 Rule of thumb (remember this)
+
+- Business logic → Scoped
+- Database access → Scoped
+- Factories → Singleton
+- External helpers (Email/SMS) → Transient
+
+---
+
+## 🧠 Architecture Name
+
+- Clean Architecture
+- Layered Architecture
+- Repository Pattern
+- Dependency Injection
+- Middleware Pipeline
+
+---
+
+## ✅ Design Principles
+
+- SOLID principles
+- Separation of concerns
+- Graceful failure
+- Secure authentication
+- Enterprise‑ready
+
+---
+
+## 🚀 Future Enhancements
+
+- Refresh tokens
+- Role‑based authorization
+- Background jobs
+- Message queues
+- Unit & integration tests
+
+---
+
+## 👨‍💻 Notes
+
+This template is suitable for:
+- Learning projects
+- Production APIs
+- Interviews
+- Government & enterprise systems
 
 ---
 

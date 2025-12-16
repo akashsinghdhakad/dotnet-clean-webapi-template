@@ -1,0 +1,38 @@
+@host = http://localhost:5215/api
+
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzMSIsInVuaXF1ZV9uYW1lIjoiYWthc2hzaW5naGRoYWthZDIzIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4LzA2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiVXNlciIsImV4cCI6MTc2NTg4NzgxNiwiaXNzIjoiZG90bmV0V2ViQXBpQ29yZUNCQSIsImF1ZCI6ImRvdG5ldFdlYkFwaUNvcmVDQkFDbGllbnQifQ.lWCqJhH40AmWlIyDQLql6jOYjgi6Uac7EjkhPvPxRck
+ 
+
+
+### Register User
+POST {{host}}/auth/register
+# Authorization: Bearer {{token}}
+Content-Type: application/json
+Accept : application/json
+
+{
+  "username": "akashsinghdhakad23",
+  "password": "Test@123"
+}
+
+### Login User
+POST {{host}}/auth/login
+# Authorization: Bearer {{token}}
+Content-Type: application/json
+Accept : application/json
+
+{
+  "username": "akashsinghdhakad23",
+  "password": "Test@123"
+}
+
+### Get User
+GET {{host}}/auth/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+Accept : application/json
+
+
+
+
+
