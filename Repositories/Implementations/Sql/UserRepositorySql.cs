@@ -1,4 +1,5 @@
 using System.Data;
+using dotnetWebApiCoreCBA.Common.Database;
 using dotnetWebApiCoreCBA.Models.Entities;
 using dotnetWebApiCoreCBA.Repositories.Interfaces;
 using Microsoft.Data.SqlClient;
@@ -9,13 +10,13 @@ namespace dotnetWebApiCoreCBA.Repositories.Implementations.Sql;
 
 public class UserRepositorySql : IUserRepository
 {
-    private readonly string _connectionString;
+    private readonly IDbConnectionFactory _connectionFactory;
+
     private readonly ILogger<UserRepositorySql> _logger;
 
-    public UserRepositorySql(IConfiguration configuration, ILogger<UserRepositorySql> logger)
+    public UserRepositorySql(IDbConnectionFactory connectionFactor, ILogger<UserRepositorySql> logger)
     {
-        _connectionString = configuration.GetConnectionString("DefaultConnection")
-                            ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+        _connectionFactory = connectionFactor;
         _logger = logger;
     }
 
@@ -26,7 +27,7 @@ public class UserRepositorySql : IUserRepository
             FROM Users
             WHERE Username = @Username;";
 
-        await using var conn = new SqlConnection(_connectionString);
+        await using var conn = _connectionFactory.Create();
         await using var cmd = new SqlCommand(sql, conn);
 
         cmd.Parameters.Add(new SqlParameter("@Username", SqlDbType.NVarChar, 256) { Value = username });
@@ -58,7 +59,7 @@ public class UserRepositorySql : IUserRepository
             OUTPUT INSERTED.Id
             VALUES (@Username, @PasswordHash, @PasswordSalt, @Role, @CreatedAt);";
 
-        await using var conn = new SqlConnection(_connectionString);
+        await using var conn = _connectionFactory.Create();
         await using var cmd = new SqlCommand(sql, conn);
 
         cmd.Parameters.Add(new SqlParameter("@Username", SqlDbType.NVarChar, 256) { Value = user.Username });

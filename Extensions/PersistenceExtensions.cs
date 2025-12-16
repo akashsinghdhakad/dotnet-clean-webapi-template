@@ -1,3 +1,4 @@
+using dotnetWebApiCoreCBA.Common.Database;
 using dotnetWebApiCoreCBA.Data;
 using dotnetWebApiCoreCBA.Repositories.Implementations.EfCore;
 using dotnetWebApiCoreCBA.Repositories.Implementations.InMemory;
@@ -13,6 +14,10 @@ public static class PersistenceConfig
         this IServiceCollection services,
         IConfiguration configuration)
     {
+
+        // Factory holds only a string and creates new SqlConnection each time.
+        services.AddSingleton<IDbConnectionFactory, SqlConnectionFactory>();
+
         var repoMode = configuration["RepositoryMode"] ?? "Ef";
 
         if (repoMode == "Ef")
@@ -28,7 +33,7 @@ public static class PersistenceConfig
             // no DbContext; use plain ADO.NET / Dapper style repository
             services.AddScoped<ITodoRepository, TodoRepositorySql>();
             // you could add Sql-based IUserRepository too if needed
-            
+
             services.AddScoped<IUserRepository, UserRepositorySql>();
         }
         else // InMemory (default for tests if you want)
