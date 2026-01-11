@@ -241,6 +241,16 @@ builder.Services.AddScoped<ITodoRepository, TodoRepositorySql>();
 ### SQL Table
 
 ```sql
+CREATE TABLE Users (
+	[Id] [int] IDENTITY(1,1) PRIMARY KEY,
+	[Username] [nvarchar](100) NOT NULL,
+	[PasswordHash] [nvarchar](max) NOT NULL,
+	[PasswordSalt] [nvarchar](max) NOT NULL,
+	[Role] [nvarchar](50) NOT NULL,
+	[CreatedAt] [datetime2](7) NOT NULL,
+);
+```
+```sql
 CREATE TABLE Todos (
     Id INT IDENTITY(1,1) PRIMARY KEY,
     Title NVARCHAR(200) NOT NULL,
