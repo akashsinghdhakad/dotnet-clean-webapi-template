@@ -32,6 +32,33 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 Accept : application/json
 
+### Get Unpiad
+POST https://localhost:44348/LicWebService.asmx/GetPaymentDetailByLicNum
+Authorization: Bearer 37CD23D670FB3DA7D8BDA1B2F695E00AE67C928B6357D49C7752A909C62BA18CF95814D87ECE25F31B552C37009178EEB795
+Content-Type: application/json
+Accept : application/json
+
+### Create User
+POST https://localhost:44348/LicWebService.asmx/CreateUser
+Authorization: Bearer 37CD23D670FB3DA7D8BDA1B2F695E00AE67C928B6357D49C7752A909C62BA18CF95814D87ECE25F31B552C37009178EEB795
+Content-Type: application/json
+Accept : application/json
+
+{
+  "user": {
+    "Name": "Akash",
+    "Email": "akash@test.com"
+  }
+}
+
+### Tes Method
+POST https://localhost:44348/LicWebService.asmx/HelloWorld
+Authorization: Bearer 37CD23D670FB3DA7D8BDA1B2F695E00AE67C928B6357D49C7752A909C62BA18CF95814D87ECE25F31B552C37009178EEB795
+Content-Type: application/json
+Accept : application/json
+
+
+
 
 
 
