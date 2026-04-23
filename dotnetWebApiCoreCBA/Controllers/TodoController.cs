@@ -3,12 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 using dotnetWebApiCoreCBA.Common;
 using dotnetWebApiCoreCBA.Models.DTOs.Todo;
 using dotnetWebApiCoreCBA.Services.Interfaces;
+using Asp.Versioning;
 
 namespace dotnetWebApiCoreCBA.Controllers
 {
-    [Route("api/[controller]")]
+    [Authorize] // Requires a valid JWT token
     [ApiController]
-    [Authorize] // require JWT by default
+    [ApiVersion("1.0")]
+    [Route("api/v{version:apiVersion}/todos")]
     public class TodoController : ControllerBase
     {
         private readonly ITodoService _service;

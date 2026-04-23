@@ -4,10 +4,13 @@ using dotnetWebApiCoreCBA.Common;
 using dotnetWebApiCoreCBA.Models.DTOs.Auth;
 using dotnetWebApiCoreCBA.Services.Interfaces;
 
+using Asp.Versioning;
+
 namespace dotnetWebApiCoreCBA.Controllers;
 
-[Route("api/[controller]")]
 [ApiController]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/auth")]
 public class AuthController : ControllerBase
 {
 
